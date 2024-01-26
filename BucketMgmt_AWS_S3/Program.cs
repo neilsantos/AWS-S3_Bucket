@@ -1,4 +1,7 @@
 
+using BucketMgmt_AWS_S3.Aplication;
+using BucketMgmt_AWS_S3.Infra;
+
 namespace BucketMgmt_AWS_S3
 {
     public class Program
@@ -13,6 +16,9 @@ namespace BucketMgmt_AWS_S3
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+
+            builder.Services.AddScoped<IAWS_Client, AWS_Client>();
+            builder.Services.AddScoped<IAmazonS3Service, AmazonS3Service>();
 
             var app = builder.Build();
 

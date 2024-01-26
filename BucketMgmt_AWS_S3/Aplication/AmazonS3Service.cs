@@ -1,4 +1,5 @@
 ﻿using BucketMgmt_AWS_S3.Infra;
+using System.Runtime.CompilerServices;
 
 namespace BucketMgmt_AWS_S3.Aplication;
 
@@ -13,10 +14,16 @@ public class AmazonS3Service : IAmazonS3Service
 
     public async Task Upload(IFormFile file, string bucketName)
     {
-        await _awsClient.UploadFileAsync(file, new Guid().ToString(), bucketName);
+        await _awsClient.UploadFileAsync(file, Guid.NewGuid().ToString(), bucketName);
     }
 
-    public void Delete() { }
+    public async Task<IEnumerable<string>> ListBuketFiles(string bucketName) => await _awsClient.ListAllFilesFromBucket(bucketName);
+    public async Task<IEnumerable<string>> ListBukets() => await _awsClient.ListAllBuckets();
 
-    public void Read() { }
+    public async Task DeleteFileFromBucket(string fileName, string bucketName)
+    {
+        await _awsClient.DeleteFileFromBucket(fileName, bucketName);
+    }
+    public async Task DownloadFile(string fileName, string bucketName) => await _awsClient.DownloadFile(fileName, bucketName);
+
 }

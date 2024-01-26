@@ -2,5 +2,9 @@
 
 public interface IAWS_Client
 {
-    Task<bool> UploadFileAsync(IFormFile file, string fileName, string bucketName);
+    Task UploadFileAsync(IFormFile file, string fileName, string bucketName);
+    Task<IEnumerable<string>> ListAllBuckets();
+    Task<IEnumerable<string>> ListAllFilesFromBucket(string bucketName);
+    Task DeleteFileFromBucket(string fileName, string bucketName);
+    Task DownloadFile(string bucketName, string fileName);
 }
