@@ -21,7 +21,8 @@ Update the appsettings.json file with your AWS credentials:
   "AWS": {
     "AccessKeyId": "your-access-key-id",
     "SecretAccessKey": "your-secret-access-key",
-    "Region": "your-region"
+    "Region": "your-region",
+    "StorageClass":"The type of storage class you choose"
   }
 }
 ```
