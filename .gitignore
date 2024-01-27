@@ -362,3 +362,4 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 /BucketMgmt_AWS_S3/appsettings.json
+/BucketMgmt_AWS_S3/appsettings.Development.json
