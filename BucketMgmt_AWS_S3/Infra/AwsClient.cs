@@ -3,15 +3,18 @@ using Amazon.Runtime.Internal;
 using Amazon.S3;
 using Amazon.S3.Model;
 using Amazon.S3.Transfer;
+using Amazon.S3.Util;
+using Microsoft.AspNetCore.DataProtection.KeyManagement;
+using S3ManagementAPI.Domain;
 
 namespace BucketMgmt_AWS_S3.Infra
 {
-    public class AWS_Client : IAWS_Client
+    public class AwsClient : IAwsClient
     {
         private readonly IAmazonS3 _awsClient;
         private readonly string _storageClass;
 
-        public AWS_Client(IConfiguration connections)
+        public AwsClient(IConfiguration connections)
         {
             string accessKeyId = connections.GetSection("AwsCredentials").GetValue<string>("AccessKeyId")!;
             string secretAccessKey = connections.GetSection("AwsCredentials").GetValue<string>("SecretAccessKey")!;
@@ -25,14 +28,30 @@ namespace BucketMgmt_AWS_S3.Infra
                                             new BasicAWSCredentials(accessKeyId, secretAccessKey),
                                             new AmazonS3Config { RegionEndpoint = _region }
                                             );
+
         }
 
+        #region Buckets
         public async Task<IEnumerable<string>> ListAllBuckets()
         {
             var buckets = await _awsClient.ListBucketsAsync();
             return buckets.Buckets.Select(x => x.BucketName);
         }
+        public async Task CreateBucket(string bucketName)
+        {
+            await _awsClient.PutBucketAsync(bucketName);
+        }
 
+        public async Task DeleteBucket(string bucketName)
+        {
+            await _awsClient.DeleteBucketAsync(bucketName);
+        }
+
+
+        #endregion
+
+
+        #region Files
         public async Task UploadFileAsync(IFormFile file, string fileName, string bucketName)
         {
             using MemoryStream inMemoryFile = new();
@@ -40,8 +59,8 @@ namespace BucketMgmt_AWS_S3.Infra
             file.CopyTo(inMemoryFile);
 
             TransferUtility fileTransferUtility = new(_awsClient);
-            
-            await fileTransferUtility.UploadAsync( 
+
+            await fileTransferUtility.UploadAsync(
                                         new TransferUtilityUploadRequest
                                         {
                                             InputStream = inMemoryFile,
@@ -59,24 +78,36 @@ namespace BucketMgmt_AWS_S3.Infra
             if (files == null)
                 return new List<string> { "Empty" };
 
-            return files.S3Objects.Select(x=>x.Key);
+            return files.S3Objects.Select(x => x.Key);
         }
 
-        public async Task DownloadFile(string fileName, string bucketName)
+        public string GetFile(string fileName, string bucketName)
         {
-            TransferUtility transferUtility = new(_awsClient);
 
-            await transferUtility.DownloadAsync(new TransferUtilityDownloadRequest
+            var urlRequest = new GetPreSignedUrlRequest()
             {
                 BucketName = bucketName,
-                Key = fileName
-            });
+                Key = fileName,
+                Expires = DateTime.UtcNow.AddMinutes(1)
+            };
+            return _awsClient.GetPreSignedURL(urlRequest);
         }
-        
+
         public async Task DeleteFileFromBucket(string fileName, string bucketName)
-        {   
-            var obj = new DeleteObjectRequest{ BucketName = bucketName, Key=fileName };
+        {
+            var obj = new DeleteObjectRequest { BucketName = bucketName, Key = fileName };
             await _awsClient.DeleteObjectAsync(obj);
         }
+
+
+        #endregion
+
+
+
+        public async Task<bool> DoesThisBucketExist(string bucketName)
+        {
+            return await AmazonS3Util.DoesS3BucketExistV2Async(_awsClient, bucketName);
+        }
+
     }
 }

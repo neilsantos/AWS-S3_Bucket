@@ -1,6 +1,10 @@
-
-using BucketMgmt_AWS_S3.Aplication;
+using BucketMgmt_AWS_S3.Aplication.Bucket;
+using BucketMgmt_AWS_S3.Aplication.File;
 using BucketMgmt_AWS_S3.Infra;
+using Microsoft.OpenApi.Models;
+using S3ManagementAPI.Domain;
+using Swashbuckle.AspNetCore.Swagger;
+using System.Reflection;
 
 namespace BucketMgmt_AWS_S3
 {
@@ -15,10 +19,25 @@ namespace BucketMgmt_AWS_S3
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
+            builder.Services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo
+                {
+                    Title = "AWS S3 Management API",
+                    Version = "v1",
+                    Description = "C# API to Manage your S3 buckets and files",
+                });
 
-            builder.Services.AddScoped<IAWS_Client, AWS_Client>();
-            builder.Services.AddScoped<IAmazonS3Service, AmazonS3Service>();
+                var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+                c.IncludeXmlComments(xmlPath);
+            }
+            );
+
+
+            builder.Services.AddScoped<IAwsClient, AwsClient>();
+            builder.Services.AddScoped<IFilesService, FilesService>();
+            builder.Services.AddScoped<IBucketService, BucketService>();
 
             var app = builder.Build();
 
