@@ -28,6 +28,6 @@ public class FilesService : IFilesService
     {
         await _awsClient.DeleteFileFromBucket(fileName, bucketName);
     }
-    public string DownloadFile(string fileName, string bucketName) => _awsClient.GetFile(fileName, bucketName);
-
+    public async Task<IEnumerable<string>> GetFilesUrl(string bucketName) => await _awsClient.GetFilesUrl(bucketName);
+    public async Task<IEnumerable<string>> GetOneFile(string fileName, string bucketName) => await _awsClient.GetFilesUrl(bucketName, fileName);
 }

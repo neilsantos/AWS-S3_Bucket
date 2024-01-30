@@ -81,16 +81,29 @@ namespace BucketMgmt_AWS_S3.Infra
             return files.S3Objects.Select(x => x.Key);
         }
 
-        public string GetFile(string fileName, string bucketName)
+        public async Task<IEnumerable<string>> GetFilesUrl(string bucketName,string fileName="")
         {
+            var request = new ListObjectsV2Request(){
+                                                        BucketName = bucketName,
+                                                    };
 
-            var urlRequest = new GetPreSignedUrlRequest()
+            var result = await _awsClient.ListObjectsV2Async(request);
+            var files = result.S3Objects.Select(s=>s.Key);
+           
+            if (!string.IsNullOrEmpty(fileName))
+                files = files.Where(x => x == fileName);
+
+            var urls = files.Select(s =>
             {
-                BucketName = bucketName,
-                Key = fileName,
-                Expires = DateTime.UtcNow.AddMinutes(1)
-            };
-            return _awsClient.GetPreSignedURL(urlRequest);
+                var urlRequest = new GetPreSignedUrlRequest()
+                {
+                    BucketName = bucketName,
+                    Key = s,
+                    Expires = DateTime.UtcNow.AddMinutes(1)
+                };
+                return _awsClient.GetPreSignedURL(urlRequest);
+            });
+            return urls;
         }
 
         public async Task DeleteFileFromBucket(string fileName, string bucketName)
@@ -99,10 +112,7 @@ namespace BucketMgmt_AWS_S3.Infra
             await _awsClient.DeleteObjectAsync(obj);
         }
 
-
         #endregion
-
-
 
         public async Task<bool> DoesThisBucketExist(string bucketName)
         {

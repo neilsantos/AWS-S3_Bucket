@@ -22,18 +22,16 @@ namespace BucketMgmt_AWS_S3.Controllers
         }
 
         /// <summary>
-        /// Retrieves a list of existing buckets.
+        /// 📋 Retrieves a list of all buckets.
         /// </summary>
+        /// <returns>
+        /// A collection of bucket names.
+        /// </returns>
         /// <remarks>
         /// **Summary**<br/>
-        /// This endpoint returns a list of existing buckets.
-        /// <br/><br/>
-        /// **Note**<br/>
-        /// The returned list may be empty if no buckets are currently available.
+        /// 🚀 This endpoint is used to retrieve a list of all buckets.
         /// </remarks>
-        /// <response code="200">OK - Returns the list of bucket names.</response>
-        /// <response code="500">Internal Server Error - An unexpected error occurred during the retrieval process.</response>
-
+        /// <response code="200">OK - The list of buckets was retrieved successfully.</response>
         [HttpGet("list-buckets")]
         public async Task<IEnumerable<string>> Read()
         {
