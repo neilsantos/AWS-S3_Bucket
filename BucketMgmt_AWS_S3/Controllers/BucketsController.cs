@@ -1,12 +1,5 @@
-﻿using Amazon.S3.Model;
-using BucketMgmt_AWS_S3.Aplication.Bucket;
-using BucketMgmt_AWS_S3.Aplication.File;
-using FluentResults;
-using Microsoft.AspNetCore.Components.Forms;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.HttpResults;
+﻿using BucketMgmt_AWS_S3.Aplication.Bucket;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
 
 namespace BucketMgmt_AWS_S3.Controllers
 {

@@ -22,8 +22,6 @@ public class FilesService : IFilesService
     }
 
     public async Task<IEnumerable<string>> ListFiles(string bucketName) => await _awsClient.ListAllFilesFromBucket(bucketName);
-    
-
     public async Task DeleteFile(string fileName, string bucketName)
     {
         await _awsClient.DeleteFileFromBucket(fileName, bucketName);
